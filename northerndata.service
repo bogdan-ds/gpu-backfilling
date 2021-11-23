@@ -1,0 +1,15 @@
+[Unit]
+Description=Backfilling guest creation
+After=multi-user.target
+[Service]
+Type=simple
+User=cloudsigma
+Environment="PATH=/home/cloudsigma/northerndata/bin"
+ExecStart=/home/cloudsigma/northerndata/bin/python3 /home/cloudsigma/northerndata/northerndata.py
+ExecStop=/bin/kill -9 "$(ps ax | grep -m1 northerndata.py | awk '{print $1}')"
+SyslogIdentifier=backfil_guest
+NotifyAccess=all
+Restart=on-failure
+WorkingDirectory=/home/cloudsigma/northerndata
+[Install]
+WantedBy=multi-user.target
