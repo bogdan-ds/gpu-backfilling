@@ -45,12 +45,12 @@ class NDTestBase:
         self.server_cpu = int(config.get('main', 'server_cpu')) * 1000
         self.server_mem = int(config.get('main', 'server_mem')) * 1073741824
         self.cpu_type = config.get('main', 'cpu_type')
-        self.drive = config.get('main', 'drive')
-        self.pubkey = config.get('main', 'pubkey')
+        self.drive = config.get('main', 'drive', fallback=None)
+        self.pubkey = config.get('main', 'pubkey', fallback=None)
         self.unique_name = config.get('main', 'unique_name')
         self.public_network = config.getboolean('main', 'public_network')
         self.private_network = config.getboolean('main', 'private_network')
-        self.vlan_uuid = config.get('main', 'vlan_uuid')
+        self.vlan_uuid = config.get('main', 'vlan_uuid', fallback=None)
         self.auto_adjust_amount = config.getboolean('main',
                                                     'auto_adjust_max_gpus')
         self.iteration_pause_sec = config.get('main', 'iteration_pause_sec')
@@ -96,7 +96,8 @@ class NDTestBase:
         if gpu_section:
             model_section = gpu_section.get(self.gpu_model)
             if model_section:
-                result_dict['total_gpus'] = model_section['total_available']
+                result_dict['total_gpus'] = model_section.get(
+                    'total_available', 0)
                 result_dict['max_per_host'] = model_section['max_per_host']
         if not result_dict.get('max_per_host', None):
             logging.info('No GPUs currently available, pausing for 5min')
