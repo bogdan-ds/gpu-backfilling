@@ -65,18 +65,9 @@ class NDTestBase:
             self.set_max_per_host()
             self.server_amount = 1
         for i in range(0, self.server_amount):
+            self.cleanup(stopped_only=True)
             guest = self.create_server()
-
-            cr.Server().start(guest['uuid'])
-            guest, seconds, success = self.wait_for_status(guest['uuid'],
-                                                           'running',
-                                                           client=cr.Server())
-            if success:
-                logging.info('Guest {} started in {} seconds'.format(
-                    guest['name'], seconds))
-
-            self.cleanup_servers(stopped_only=True)
-            self.cleanup_drives()
+            self.start_guest(guest)
             self.server_amount = None
 
     def calculate_max_backfilling_servers(self):
@@ -195,8 +186,26 @@ class NDTestBase:
                              client=cr.Drive())
         return cloned_drive['uuid']
 
-    def cleanup(self):
-        self.cleanup_servers()
+    def start_guest(self, guest):
+        success = False
+        try:
+            cr.Server().start(guest['uuid'])
+        except errors.ServerError as e:
+            logging.info('Guest {} failed to '
+                         'start with error: {}'.format(guest['uuid'],
+                                                       e.message))
+            return success
+        guest, seconds, success = self.wait_for_status(guest['uuid'],
+                                                       'running',
+                                                       client=cr.Server())
+        if success:
+            logging.info('Guest {} started in {} seconds'.format(
+                guest['name'], seconds))
+
+        return success
+
+    def cleanup(self, stopped_only=False):
+        self.cleanup_servers(stopped_only=stopped_only)
         self.cleanup_drives()
 
     def cleanup_servers(self, stopped_only=False):
@@ -217,6 +226,7 @@ class NDTestBase:
                     intermediate.append(server['uuid'])
         
         for uuid in stopping:
+            success = False
             try:
                 guest, timeout, success = self.wait_for_status(uuid,
                                                                'stopped',
