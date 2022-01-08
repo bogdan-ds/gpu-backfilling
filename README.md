@@ -55,18 +55,18 @@ The script can be run directly or as a systemd service which will run in the bac
 For a direct run, simply set the needed configuration and run directly within the virtual environment:
 
 ```
-python northerndata.py
+python backfill.py
 ```
 
 When running as a systemd service, you need to edit the service file in this repository with the correct paths.
 Optionally the service can be enabled on boot:
 
 ```
-sudo systemctl enable northerndata.service
+sudo systemctl enable backfill.service
 ```
 
 Starting the service:
 
 ```
-sudo systemctl start northerndata.service
+sudo systemctl start backfill.service
 ```

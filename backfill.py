@@ -88,7 +88,7 @@ class NDTestBase:
             model_section = gpu_section.get(self.gpu_model)
             if model_section:
                 result_dict['total_gpus'] = model_section.get(
-                    'total_available', 0)
+                    'available_backfill', 0)
                 result_dict['max_per_host'] = model_section['max_per_host']
         if not result_dict.get('max_per_host', None):
             logging.info('No GPUs currently available, pausing for 5min')

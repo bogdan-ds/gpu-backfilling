@@ -1,0 +1,15 @@
+[Unit]
+Description=Backfilling guest creation
+After=multi-user.target
+[Service]
+Type=simple
+User=cloudsigma
+Environment="PATH=/home/cloudsigma/backfill/bin"
+ExecStart=/home/cloudsigma/backfill/bin/python3 /home/cloudsigma/backfill/backfill.py
+ExecStop=/bin/kill -9 "$(ps ax | grep -m1 backfill.py | awk '{print $1}')"
+SyslogIdentifier=backfil_guest
+NotifyAccess=all
+Restart=on-failure
+WorkingDirectory=/home/cloudsigma/backfill
+[Install]
+WantedBy=multi-user.target
